@@ -1,0 +1,9 @@
+.players-table{
+    border: 1px solid black;
+}
+
+.header-cell{
+    border: 1px solid black;
+    min-width: 80px;
+    padding: 3px;
+}
