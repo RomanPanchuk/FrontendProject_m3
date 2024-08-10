@@ -1,7 +1,12 @@
-fillTable()
+let playersCount = null;
+let playersPerPage = 3;
+let pagesAmount = null;
 
-function fillTable() {
-    $.get('rest/players', (players) => {
+fillTable(0,playersPerPage)
+updatePlayersCount()
+
+function fillTable(pageNumber,pageSize) {
+    $.get(`/rest/players?pageNumber=${pageNumber}&pageSize=${pageSize}`, (players) => {
         console.log(players);
 
         const $playersTableBody = $(`.players-table-body`)[0];
@@ -23,4 +28,25 @@ function fillTable() {
 
         $playersTableBody.insertAdjacentHTML("beforeend", htmlRows);
     })
+}
+
+function updatePlayersCount() {
+    $.get('/rest/players/count', (count) => {
+        playersCount = count;
+        createPaginationButtons();
+    })
+}
+
+function createPaginationButtons(){
+    pagesAmount = playersCount ? Math.ceil(playersCount / playersPerPage) : 0;
+
+    const $buttonsContainer = document.querySelector('.pagination-buttons');
+
+    let paginationButtonsHTML = '';
+
+    for (let i = 1; i < pagesAmount; i++) {
+        paginationButtonsHTML += `<button value="${i - 1}">${i}</button>`;
+    }
+
+    $buttonsContainer.insertAdjacentHTML("beforeend", paginationButtonsHTML)
 }
