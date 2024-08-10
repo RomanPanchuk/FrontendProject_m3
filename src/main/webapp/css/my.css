@@ -4,6 +4,15 @@
 
 .header-cell{
     border: 1px solid black;
-    min-width: 80px;
+    min-width: 50px;
     padding: 3px;
+}
+
+.cell{
+    border: 1px solid;
+}
+
+.cell_small{
+    /*width: 40px;*/
+    min-width: auto;
 }
