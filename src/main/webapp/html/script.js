@@ -49,7 +49,7 @@ function updatePaginationButtons(){
 
     let paginationButtonsHTML = '';
 
-    for (let i = 1; i < accountsAmount; i++) {
+    for (let i = 1; i <= accountsAmount; i++) {
         paginationButtonsHTML += `<button value="${i - 1}">${i}</button>`;
     }
 
@@ -60,6 +60,7 @@ function updatePaginationButtons(){
     $buttonsContainer.insertAdjacentHTML("beforeend", paginationButtonsHTML);
     Array.from($buttonsContainer.children).forEach(button => button.addEventListener('click',onPageChange))
 
+    setActivePageButton(currentPageNumber);
 }
 
 function createAccountPerPageDropDown() {
@@ -83,11 +84,39 @@ function createSelectOptions(optionArray, defaultValue) {
 
 function onAccountsPerPageChangeHandler(e) {
     accountsPerPage = e.currentTarget.value;
-    fillTable(currentPageNumber,accountsPerPage);
+    // fillTable(currentPageNumber,accountsPerPage);
     updatePaginationButtons();
+    onPageChange(e);
+    
 }
 
 function onPageChange(e) {
-    currentPageNumber = e.currentTarget.value;
+    // const targetPageIndex = e.currentTarget.value;
+    let targetPageIndex = e.currentTarget.value;
+    if (targetPageIndex > accountsAmount){
+        targetPageIndex = accountsAmount - 1;
+    }
+
+    setActivePageButton(targetPageIndex);
+
+    currentPageNumber = targetPageIndex;
     fillTable(currentPageNumber, accountsPerPage);
+
+    setActivePageButton(currentPageNumber);
+}
+
+function setActivePageButton(buttonIndex = 0) {
+
+    if (buttonIndex > accountsAmount){
+        buttonIndex = accountsAmount - 1;
+        currentPageNumber = buttonIndex;
+    }
+
+    const $buttonsContainer = document.querySelector('.pagination-buttons');
+    const $targetButton = Array.from($buttonsContainer.children)[buttonIndex];
+    const $currentActiveButton = Array.from($buttonsContainer.children)[currentPageNumber];
+
+    $currentActiveButton.classList.remove('active-pagination-button');
+    $targetButton.classList.add('active-pagination-button');
+
 }
