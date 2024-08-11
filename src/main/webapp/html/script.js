@@ -1,8 +1,10 @@
-let playersCount = null;
-let playersPerPage = 3;
-let pagesAmount = null;
+let accountsCount = null;
+let accountsPerPage = 3;
+let accountsAmount = null;
+let currentPageNumber = 0;
 
-fillTable(0,playersPerPage)
+createAccountPerPageDropDown()
+fillTable(currentPageNumber,accountsPerPage)
 updatePlayersCount()
 
 function fillTable(pageNumber,pageSize) {
@@ -26,27 +28,66 @@ function fillTable(pageNumber,pageSize) {
                  </tr>`
         })
 
+        Array.from($playersTableBody.children).forEach(row => row.remove());
+
         $playersTableBody.insertAdjacentHTML("beforeend", htmlRows);
     })
 }
 
 function updatePlayersCount() {
     $.get('/rest/players/count', (count) => {
-        playersCount = count;
-        createPaginationButtons();
+        accountsCount = count;
+        updatePaginationButtons();
     })
 }
 
-function createPaginationButtons(){
-    pagesAmount = playersCount ? Math.ceil(playersCount / playersPerPage) : 0;
+function updatePaginationButtons(){
+    accountsAmount = accountsCount ? Math.ceil(accountsCount / accountsPerPage) : 0;
 
     const $buttonsContainer = document.querySelector('.pagination-buttons');
+    const childButtonsCount = $buttonsContainer.children.length;
 
     let paginationButtonsHTML = '';
 
-    for (let i = 1; i < pagesAmount; i++) {
+    for (let i = 1; i < accountsAmount; i++) {
         paginationButtonsHTML += `<button value="${i - 1}">${i}</button>`;
     }
 
-    $buttonsContainer.insertAdjacentHTML("beforeend", paginationButtonsHTML)
+    if (childButtonsCount !== 0){
+        Array.from($buttonsContainer.children).forEach(node => node.remove())
+    }
+
+    $buttonsContainer.insertAdjacentHTML("beforeend", paginationButtonsHTML);
+    Array.from($buttonsContainer.children).forEach(button => button.addEventListener('click',onPageChange))
+
+}
+
+function createAccountPerPageDropDown() {
+    const $dropDown = document.querySelector('.accounts-per-page');
+    const options = createSelectOptions([3,5,10,20],3);
+
+    $dropDown.addEventListener('change',onAccountsPerPageChangeHandler);
+    $dropDown.insertAdjacentHTML('afterbegin', options);
+}
+
+function createSelectOptions(optionArray, defaultValue) {
+    let optionHtml = '';
+
+    optionArray.forEach(option => optionHtml +=
+        `<option ${defaultValue === option && 'selected'} value="${option}">
+            ${option}
+        </option>`)
+
+    return optionHtml;
+}
+
+function onAccountsPerPageChangeHandler(e) {
+    accountsPerPage = e.currentTarget.value;
+    fillTable(currentPageNumber,accountsPerPage);
+    updatePaginationButtons();
+}
+
+function onPageChange(e) {
+    currentPageNumber = e.currentTarget.value;
+    fillTable(currentPageNumber, accountsPerPage);
 }
