@@ -141,6 +141,20 @@ function removeAccountHandler(e) {
     });
 }
 
+function updateAccount({accountId, data}) {
+    $.ajax({
+        url: `/rest/players/${accountId}`,
+        type: 'POST',
+        data: JSON.stringify(data),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function () {
+            updatePlayersCount();
+            fillTable(currentPageNumber, accountsPerPage);
+        }
+    })
+}
+
 function editAccountHandler(e) {
     const accountId = e.currentTarget.value;
     const $currentRow = document.querySelector(`.row[data-account-id = '${accountId}']`);
@@ -154,6 +168,22 @@ function editAccountHandler(e) {
     const $currentBanned = $currentRow.querySelector('[data-account-banned]')
 
     $currentImage.src = '../img/save.png';
+
+    $currentImage.addEventListener('click', () => {
+        const params = {
+            accountId: accountId,
+            data: {
+                name: $currentName.childNodes[0].getAttribute('data-value'),
+                title: $currentTitle.childNodes[0].getAttribute('data-value'),
+                race: $currentRace.childNodes[0].getAttribute('data-value'),
+                profession: $currentProfession.childNodes[0].getAttribute('data-value'),
+                banned: $currentBanned.childNodes[0].getAttribute('data-value'),
+            }
+        }
+        updateAccount(params);
+    })
+
+    $currentRemoveButton.classList.add('hidder');
 
     $currentName.childNodes[0].replaceWith(creatInput($currentName.innerHTML))
     $currentTitle.childNodes[0].replaceWith(creatInput($currentTitle.innerHTML))

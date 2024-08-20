@@ -29,3 +29,7 @@
 .active-pagination-button{
     color: red;
 }
+
+.hidder{
+    visibility: hidden;
+}
