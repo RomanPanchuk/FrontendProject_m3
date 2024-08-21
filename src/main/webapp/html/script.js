@@ -7,9 +7,19 @@ const RACE_ARRAY = ['HUMAN', 'DWARF', 'ELF', 'GIANT', 'ORC', 'TROLL', 'HOBBIT'];
 const PROFESSION_ARRAY = ['WARRIOR', 'ROGUE', 'SORCERER', 'CLERIC', 'PALADIN', 'NAZGUL', 'WARLOCK', 'DRUID'];
 const BANNED_ARRAY = ['true', 'false'];
 
+initCreateForm()
 createAccountPerPageDropDown()
 fillTable(currentPageNumber, accountsPerPage)
 updatePlayersCount()
+
+function initCreateForm() {
+    console.log('ok')
+    const $raceSelect = document.querySelector('[data-create-race]');
+    const $professionSelect = document.querySelector('[data-create-profession]');
+
+    $raceSelect.insertAdjacentHTML('afterbegin', createSelectOptions(RACE_ARRAY, RACE_ARRAY[0]))
+    $professionSelect.insertAdjacentHTML('afterbegin', createSelectOptions(PROFESSION_ARRAY, PROFESSION_ARRAY[0]))
+}
 
 function fillTable(pageNumber, pageSize) {
     $.get(`/rest/players?pageNumber=${pageNumber}&pageSize=${pageSize}`, (players) => {
@@ -126,6 +136,30 @@ function setActivePageButton(buttonIndex = 0) {
     $currentActiveButton.classList.remove('active-pagination-button');
     $targetButton.classList.add('active-pagination-button');
 
+}
+
+function createAccount(){
+    const data = {
+        name: $('[data-create-name]').val(),
+        title: $('[data-create-title]').val(),
+        race: $('[data-create-race]').val(),
+        level: $('[data-create-level]').val(),
+        birthday: new Date($('[data-create-birthday]').val()).getTime(),
+        profession: $('[data-create-profession]').val(),
+        banned: $('[data-create-banned]').val() === 'on'
+    }
+
+    $.ajax({
+        url: `/rest/players/`,
+        type: 'POST',
+        data: JSON.stringify(data),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function () {
+            updatePlayersCount();
+            fillTable(currentPageNumber, accountsPerPage);
+        }
+    })
 }
 
 function removeAccountHandler(e) {
